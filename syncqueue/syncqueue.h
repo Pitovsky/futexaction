@@ -5,10 +5,25 @@ template <typename Container>
 class CSyncContainer {
 private:
     typedef typename Container::value_type value_type;
+
     Container data;
+
+    class PushPopWrapper {
+    private:
+        Container data;
+
+    public:
+        void push(const value_type& element) {
+            data.push_back(element);
+        }
+        void pop() {
+            data.pop_back();
+        }
+    };
+    PushPopWrapper* pushPopData = nullptr;
+
     std::condition_variable hasData;
     std::mutex mutex;
-
 
     value_type& hardPop() {
         if (/*pop exists*/ true) {
@@ -22,8 +37,24 @@ private:
         }
     }
 
+    class hasPushPopMethods {
+    private:
+        typedef long yes;
+        typedef char no; //only different-sized types
+
+        ///dirty hack: if method exist, it will be more priority than '...'
+        template<typename C, void (C::*)() = &C::push> static yes test( C* );//now only push test, but for STL it is enough
+        template <typename C> static no test(...);
+
+    public:
+        static const int value = sizeof(test<Container>(nullptr));
+        //bool value = (sizeof(test<Container>(0)) == sizeof(yes));
+    };
 
 public:
+    CSyncContainer() {
+        std::cout << hasPushPopMethods::value << "\n";
+    }
 
     void push(const value_type& element) {
         std::unique_lock<std::mutex> security(mutex);
