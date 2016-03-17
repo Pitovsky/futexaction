@@ -11,14 +11,15 @@ private:
 
 
     value_type& hardPop() {
-        value_type& value = data.back(); //unfortunately, in one case we must return vector.back(), in other queue.front()
         if (/*pop exists*/ true) {
-            value = data.front();
+            value_type& value = data.front();
             data.pop();
+            return value;
         } else {
-            data.pop_back(); //i want to do pop_front, but in task...
+            value_type& value = data.back();
+           // data.pop_back(); //i want to do pop_front, but in task...
+            return value;
         }
-        return value;
     }
 
 
@@ -28,8 +29,9 @@ public:
         std::unique_lock<std::mutex> security(mutex);
         if (/*push exists*/ true) {
             data.push(element);
+            std::cout << "pushed" << element << "\n";
         } else {
-            data.push_back(element);
+          //  data.push_back(element);
         }
         hasData.notify_one();
     }
@@ -42,12 +44,12 @@ public:
         return hardPop();
     }
 
-    value_type* popNoWait() { //* because null if no elements found
+    value_type* popNoWait() { //pointer because null if no elements found
         std::unique_lock<std::mutex> security(mutex);
         if (data.empty()) {
             return nullptr;
         }
-        return *hardPop();
+        return &hardPop();
     }
 
     void suicide() {
