@@ -1,5 +1,7 @@
 #include <iostream>
 #include <vector>
+#include <deque>
+#include <list>
 #include <queue>
 #include <thread>
 #include <mutex>
@@ -25,7 +27,6 @@ void pusher(const std::vector<int>& input, size_t begin, size_t end, CSyncContai
 
 template <typename Container>
 void testCSyncContainer(size_t pushersCount, size_t printersCount, size_t dataPerThread) {
-    std::cout << "-------------------------------\n";
     CSyncContainer<Container> data;
     size_t dataSize = dataPerThread * pushersCount * printersCount;
     std::vector<int> tableData(dataSize);
@@ -93,7 +94,12 @@ int main() {
 
     srand(time(NULL));
     for (size_t readerCount = 1; readerCount < 6; ++readerCount) {
+        std::cout << "======================\nvector:\n";
         testCSyncContainer<std::vector<int>>(readerCount, 6 - readerCount, 10000); //for different count of pushers and printers
+        std::cout << "======================\ndeque:\n";
+        testCSyncContainer<std::deque<int>>(readerCount, 6 - readerCount, 10000);
+        std::cout << "======================\nlist:\n";
+        testCSyncContainer<std::list<int>>(readerCount, 6 - readerCount, 10000);
     }
     return 0;
 }
