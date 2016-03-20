@@ -1,6 +1,5 @@
 #include <mutex>
 #include <condition_variable>
-#include <limits>
 
 template <typename C>
 class PushPopWrapper {
@@ -55,9 +54,12 @@ public:
 
     value_type popNoWait(bool* success); //if success is not null, it will be changed on true ioi method return real popped element
 
-    static const value_type noElement = std::numeric_limits<value_type>::max(); //is popNoWait was not success, it will be returned
+    static const value_type noElement; //standart-constructed value_type. If popNoWait was not success, it will be returned
 
 };
+
+template <typename Container>
+const typename CSyncContainer<Container>::value_type CSyncContainer<Container>::noElement = value_type();
 
 template <typename Container>
 void CSyncContainer<Container>::push(value_type element) {

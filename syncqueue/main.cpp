@@ -1,10 +1,10 @@
 #include <iostream>
+#include <string>
 #include <vector>
 #include <deque>
 #include <list>
 #include <queue>
 #include <thread>
-#include <mutex>
 #include <time.h>
 #include <algorithm>
 #include "syncqueue.h"
@@ -83,14 +83,28 @@ void testCSyncContainer(size_t pushersCount, size_t printersCount, size_t dataPe
     }
 }
 
+struct TS {
+    char u;
+    std::string v;
+    TS(char nu = 'a', std::string nv = "undefined") {u = nu; v = nv;}
+};
+
 int main() {
 
+    CSyncContainer<std::list<TS>> testData;
+    testData.push(TS('i', "pushed"));
+    std::cout << testData.popOrWait().v << " ";
+    std::cout << testData.popNoWait(nullptr).v << "\n";
+
     CSyncContainer<std::vector<int>> data;
+    bool test;
     data.push(15);
     data.push(10);
     std::cout << data.popOrWait() << "\n";
-    std::cout << data.popNoWait(nullptr) << "\n";
-    std::cout << data.popNoWait(nullptr) << "\n";
+    std::cout << data.popNoWait(&test) << ":";
+    std::cout << test << "\n";
+    std::cout << data.popNoWait(&test) << ":";
+    std::cout << test << "\n";
 
     srand(time(NULL));
     for (size_t readerCount = 1; readerCount < 6; ++readerCount) {
