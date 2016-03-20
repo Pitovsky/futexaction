@@ -36,28 +36,6 @@ typename PushPopWrapper<C>::value_type PushPopWrapper<C>::pop() {
     return element;
 }
 
-/*template<typename value_type>
-class PushPopWrapper<std::queue<value_type>> {
-private:
-    std::queue<value_type> data;
-
-public:
-    void push(const value_type& element) {
-        data->push(element);
-    }
-    void pop() {
-        data->pop();
-    }
-
-    value_type& first() {
-        return data->front();
-    }
-
-    size_t empty() {
-        return data->empty();
-    }
-};*/
-
 template <typename Container>
 class CSyncContainer {
 private:
@@ -71,28 +49,43 @@ private:
 
 public:
 
-    void push(const value_type& element) {
-        std::unique_lock<std::mutex> security(mutex);
-        data.push(element);
-        hasData.notify_one();
-    }
+    void push(value_type element); //note that element will be copied
 
-    value_type popOrWait() {
-        std::unique_lock<std::mutex> security(mutex);
-        while (data.empty()) {
-            hasData.wait(security);
-        }
-        return data.pop();
-    }
+    value_type popOrWait();
 
-    static const value_type noElement = std::numeric_limits<value_type>::max(); //it is bad, but i am too lazy
+    value_type popNoWait(bool* success); //if success is not null, it will be changed on true ioi method return real popped element
 
-    value_type popNoWait() { //pointer because null if no elements found
-        std::unique_lock<std::mutex> security(mutex);
-        if (data.empty()) {
-            return noElement;
-        }
-        return data.pop();
-    }
+    static const value_type noElement = std::numeric_limits<value_type>::max(); //is popNoWait was not success, it will be returned
 
 };
+
+template <typename Container>
+void CSyncContainer<Container>::push(value_type element) {
+    std::unique_lock<std::mutex> security(mutex);
+    data.push(element);
+    hasData.notify_one();
+}
+
+template <typename Container>
+typename CSyncContainer<Container>::value_type CSyncContainer<Container>::popOrWait() {
+    std::unique_lock<std::mutex> security(mutex);
+    while (data.empty()) {
+        hasData.wait(security);
+    }
+    return data.pop();
+}
+
+template <typename Container>
+typename CSyncContainer<Container>::value_type CSyncContainer<Container>::popNoWait(bool* success) {
+    std::unique_lock<std::mutex> security(mutex);
+    if (data.empty()) {
+        if (success != nullptr) {
+            *success = false;
+        }
+        return noElement;
+    }
+    if (success != nullptr) {
+        *success = true;
+    }
+    return data.pop();
+}
