@@ -4,7 +4,11 @@
 #include <vector>
 #include <thread>
 #include <string>
+#include <algorithm>
 
+/** test synchronized container in simple way - k threads write data into it, m threads read it, and then writen
+  * and readed data are comparing on same elements containing.
+  */
 template <typename Container>
 class testSyncContainer {
 private:
@@ -48,7 +52,6 @@ public:
                     i * (dataSize / pushersCount), (i + 1) * (dataSize / pushersCount), std::ref(data)));
         }
         size_t sumOutputSize = 0;
-        std::mutex sumOutputMutex;
         for (size_t i = 0; i < printersCount; ++i) {
             printers.push_back(std::thread(Printer(), std::ref(data), std::ref(outputs[i]), dataSize / printersCount));
         }
@@ -91,8 +94,11 @@ public:
 
     static bool differentThreadCountTest(size_t maxThreadCount, size_t dataPerThread, std::string containerName = "SyncCont") {
         for (size_t i = 1; i < maxThreadCount; ++i) {
-            test(i, maxThreadCount - i, dataPerThread, containerName);
+            if (!test(i, maxThreadCount - i, dataPerThread, containerName)) {
+                return false;
+            }
         }
+        return true;
     }
 
 };

@@ -29,12 +29,21 @@ public:
         newNode->next = previousNode;
     }
 
-    E pop() {
+    bool popInto(E& element) {
         Node* top = head;
-        while (!head.compare_exchange_strong(top, top->next));
-        E topValue = top->value;
+        do {
+            if (top == nullptr) {
+                return false;
+            }
+        } while (!head.compare_exchange_strong(top, top->next));
+        element = top->value;
         delete top;
-        return topValue;
+        return true;
+    }
+
+    void pop() {
+        E temp;
+        popInto(temp);
     }
 
     bool empty() {

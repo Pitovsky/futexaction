@@ -72,9 +72,6 @@ public:
 
 template <typename Container>
 class CSyncContainer {
-private:
-    typedef typename Container::value_type value_type;
-
     PushPopWrapper<Container> data;
 
     std::condition_variable hasData;
@@ -82,6 +79,8 @@ private:
 
 
 public:
+
+    typedef typename Container::value_type value_type;
 
     void push(value_type element); //note that element will be copied
 
