@@ -3,6 +3,7 @@
 
 #include <vector>
 #include <thread>
+#include <string>
 
 template <typename Container>
 class testSyncContainer {
@@ -28,7 +29,8 @@ private:
     };
 
 public:
-    static bool test(size_t pushersCount, size_t printersCount, size_t dataPerThread) {
+    ///note, that methods use rand(), and you should do srand() before
+    static bool test(size_t pushersCount, size_t printersCount, size_t dataPerThread, std::string containerName = "SyncCont") {
         Container data;
         size_t dataSize = dataPerThread * pushersCount * printersCount;
         std::vector<int> tableData(dataSize);
@@ -68,7 +70,7 @@ public:
             finalData.insert(finalData.end(), outputs[i].begin(), outputs[i].end());
         }
         std::sort(finalData.begin(), finalData.end());
-        std::cout << "(data: " << dataSize << ") => " << pushersCount << "x pushers => (CSyncContainer) => "
+        std::cout << "(data: " << dataSize << ") => " << pushersCount << "x pushers => (" << containerName << ") => "
                 << printersCount << "x printers: ";
         if (finalData == tableData) {
             std::cout << "OK\n";
@@ -85,6 +87,12 @@ public:
             return false;
         }
         return true;
+    }
+
+    static bool differentThreadCountTest(size_t maxThreadCount, size_t dataPerThread, std::string containerName = "SyncCont") {
+        for (size_t i = 1; i < maxThreadCount; ++i) {
+            test(i, maxThreadCount - i, dataPerThread, containerName);
+        }
     }
 
 };

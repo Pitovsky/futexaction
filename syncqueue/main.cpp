@@ -35,17 +35,15 @@ int main() {
     std::cout << test << "\n";
 
     srand(time(NULL));
-    for (size_t readerCount = 1; readerCount < 6; ++readerCount) {
-        std::cout << "======================\nvector:\n";
-        testSyncContainer<CSyncContainer<std::vector<int>>>::test(readerCount, 6 - readerCount, 10000); //for different count of pushers and printers
-        std::cout << "======================\ndeque:\n";
-        testSyncContainer<CSyncContainer<std::deque<int>>>::test(readerCount, 6 - readerCount, 10000);
-        std::cout << "======================\nlist:\n";
-        testSyncContainer<CSyncContainer<std::list<int>>>::test(readerCount, 6 - readerCount, 10000);
-        std::cout << "======================\nqueue:\n";
-        testSyncContainer<CSyncContainer<std::queue<int>>>::test(readerCount, 6 - readerCount, 10000);
-        std::cout << "======================\nstack:\n";
-        testSyncContainer<CSyncContainer<std::stack<int>>>::test(readerCount, 6 - readerCount, 10000);
-    }
+    std::cout << "======================\nvector:\n";
+    testSyncContainer<CSyncContainer<std::vector<int>>>::differentThreadCountTest(6, 10000, "CSyncContainer");
+    std::cout << "======================\ndeque:\n";
+    testSyncContainer<CSyncContainer<std::deque<int>>>::differentThreadCountTest(6, 10000, "CSyncContainer");
+    std::cout << "======================\nlist:\n";
+    testSyncContainer<CSyncContainer<std::list<int>>>::differentThreadCountTest(6, 10000, "CSyncContainer");
+    std::cout << "======================\nqueue:\n";
+    testSyncContainer<CSyncContainer<std::queue<int>>>::differentThreadCountTest(6, 10000, "CSyncContainer");
+    std::cout << "======================\nstack:\n";
+    testSyncContainer<CSyncContainer<std::stack<int>>>::differentThreadCountTest(6, 10000, "CSyncContainer");
     return 0;
 }
