@@ -8,32 +8,67 @@ private:
     C data;
 
 public:
-    void push(value_type element);
-    value_type pop();
-    size_t empty();
+    void push(value_type element) {
+        data.push_back(element);
+    }
+
+    value_type pop() {
+        value_type element = data.back();
+        data.pop_back();
+        return element;
+    }
+
+    size_t empty() {
+        return data.empty();
+    }
 };
 
-template<typename C>
-size_t PushPopWrapper<C>::empty() {
-    return data.empty();
-}
+///Sorry for copypaste, but i had not found any working alternative ways
+template <typename E>
+class PushPopWrapper<std::queue<E>> {
+private:
+    typedef typename std::queue<E>::value_type value_type;
+    std::queue<E> data;
 
-///it is not work!
-/*template<typename value_type>
-void PushPopWrapper<std::queue<value_type>>::push(const value_type& element) {
-    data.push(element);
-}*/
-template<typename C>
-void PushPopWrapper<C>::push(value_type element) {
-    data.push_back(element);
-}
+public:
+    void push(value_type element) {
+        data.push(element);
+    }
 
-template<typename C>
-typename PushPopWrapper<C>::value_type PushPopWrapper<C>::pop() {
-    value_type element = data.back();
-    data.pop_back();
-    return element;
-}
+    value_type pop() {
+        value_type element = data.front();
+        data.pop();
+        return element;
+    }
+
+    size_t empty() {
+        return data.empty();
+    }
+};
+
+template <typename E>
+class PushPopWrapper<std::stack<E>> {
+private:
+    typedef typename std::stack<E>::value_type value_type;
+    std::stack<E> data;
+
+public:
+    void push(value_type element) {
+        data.push(element);
+    }
+
+    value_type pop() {
+        value_type element = data.top();
+        data.pop();
+        return element;
+    }
+
+    size_t empty() {
+        return data.empty();
+    }
+};
+
+
 
 template <typename Container>
 class CSyncContainer {

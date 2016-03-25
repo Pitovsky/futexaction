@@ -4,6 +4,7 @@
 #include <deque>
 #include <list>
 #include <queue>
+#include <stack>
 #include <thread>
 #include <time.h>
 #include <algorithm>
@@ -26,7 +27,7 @@ void pusher(const std::vector<int>& input, size_t begin, size_t end, CSyncContai
 }
 
 template <typename Container>
-void testCSyncContainer(size_t pushersCount, size_t printersCount, size_t dataPerThread) {
+bool testCSyncContainer(size_t pushersCount, size_t printersCount, size_t dataPerThread) {
     CSyncContainer<Container> data;
     size_t dataSize = dataPerThread * pushersCount * printersCount;
     std::vector<int> tableData(dataSize);
@@ -80,7 +81,9 @@ void testCSyncContainer(size_t pushersCount, size_t printersCount, size_t dataPe
             std::cout << ", " << finalData[i];
         }
         std::cout << "]\n";
+        return false;
     }
+    return true;
 }
 
 struct TS {
@@ -91,7 +94,7 @@ struct TS {
 
 int main() {
 
-    CSyncContainer<std::list<TS>> testData;
+    CSyncContainer<std::queue<TS>> testData;
     testData.push(TS('i', "pushed"));
     std::cout << testData.popOrWait().v << " ";
     std::cout << testData.popNoWait(nullptr).v << "\n";
@@ -114,6 +117,10 @@ int main() {
         testCSyncContainer<std::deque<int>>(readerCount, 6 - readerCount, 10000);
         std::cout << "======================\nlist:\n";
         testCSyncContainer<std::list<int>>(readerCount, 6 - readerCount, 10000);
+        std::cout << "======================\nqueue:\n";
+        testCSyncContainer<std::queue<int>>(readerCount, 6 - readerCount, 10000);
+        std::cout << "======================\nstack:\n";
+        testCSyncContainer<std::stack<int>>(readerCount, 6 - readerCount, 10000);
     }
     return 0;
 }
